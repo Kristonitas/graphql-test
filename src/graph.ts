@@ -1,5 +1,6 @@
 import { gql } from "apollo-server";
 import { QueryResolvers, MutationResolvers } from "./generated/types";
+import * as db from "../db/index";
 
 const typeDefs = gql`
 	type Query {
@@ -21,7 +22,6 @@ const typeDefs = gql`
 
 const coursesData = [
 	{
-		id: 1,
 		title: "The Complete Node.js Developer Course",
 		author: "Andrew Mead, Rob Percival",
 		description:
@@ -30,7 +30,6 @@ const coursesData = [
 		url: "https://codingthesmartway.com/courses/nodejs/"
 	},
 	{
-		id: 2,
 		title: "Node.js, Express & MongoDB Dev to Deployment",
 		author: "Brad Traversy",
 		description:
@@ -39,7 +38,6 @@ const coursesData = [
 		url: "https://codingthesmartway.com/courses/nodejs-express-mongodb/"
 	},
 	{
-		id: 3,
 		title: "JavaScript: Understanding The Weird Parts",
 		author: "Anthony Alicea",
 		description:
@@ -49,33 +47,67 @@ const coursesData = [
 	}
 ];
 
-const course: QueryResolvers["course"] = (parent, args) => {
-	const id = args.id;
-	return coursesData.filter(course => {
-		return course.id === id;
-	})[0];
-};
-
-const courses: QueryResolvers["courses"] = (parent, args) => {
-	if (args.topic) {
-		const topic = args.topic;
-		return coursesData.filter(course => course.topic === topic);
-	} else {
-		return coursesData;
+db.execute(async () => {
+	const courseRep = db.getCourseRepository();
+	const entries = await courseRep.count();
+	if (entries > 0) {
+		return;
 	}
+
+	for (const c of coursesData) {
+		const entity = await courseRep.create(c);
+		await courseRep.save(entity);
+	}
+});
+
+const course: QueryResolvers["course"] = async (parent, args) => {
+	const { id } = args;
+
+	return await db.execute(async () => {
+		const courseRep = db.getCourseRepository();
+
+		const course = await courseRep.findOne(id);
+
+		// TODO: why graphql wants non-nullable return?
+		return course!;
+	});
 };
 
-const updateCourseTopic: MutationResolvers["updateCourseTopic"] = (
-	parent,
-	{ id, topic }
-) => {
-	coursesData.map(course => {
-		if (course.id === id) {
-			course.topic = topic;
-			return course;
-		}
+const courses: QueryResolvers["courses"] = async (parent, args) => {
+	const { topic } = args;
+
+	if (topic == undefined) {
+		return [];
+	}
+
+	return await db.execute(async () => {
+		const courseRep = db.getCourseRepository();
+
+		const courses = await courseRep.find({ topic });
+
+		return courses;
 	});
-	return coursesData.filter(course => course.id === id)[0];
+};
+
+const updateCourseTopic: MutationResolvers["updateCourseTopic"] = async (
+	parent,
+	args
+) => {
+	const { id, topic } = args;
+
+	return await db.execute(async () => {
+		const courseRep = db.getCourseRepository();
+
+		const course = await courseRep.findOne(id);
+
+		if (!course) {
+			// TODO: why graphql wants non-nullable return?
+			return course!;
+		}
+
+		course.topic = topic;
+		return await courseRep.save(course);
+	});
 };
 
 const resolvers = {
