@@ -1,19 +1,15 @@
-import express from "express";
-import { createServer } from "http";
-import graph from "./graph";
+import { ApolloServer } from "apollo-server";
+import { typeDefs, resolvers } from "./graph";
 
-// Can reuse server instance with createServer
-// https://stackoverflow.com/questions/17696801/express-js-app-listen-vs-server-listen
-
-const app = express();
-const dev = process.env.NODE_ENV !== "production";
-
-app.get("/", (req, res) => {
-	res.send("Hello World! " + (dev ? "dev" : "prod"));
+const server = new ApolloServer({
+	typeDefs,
+	resolvers
 });
 
-app.use("/graphql", graph);
-
-createServer(app).listen(3574, () => {
-	console.log("Listening on port 3574!");
-});
+server
+	.listen({
+		port: 3574
+	})
+	.then(({ url }) => {
+		console.log(`🚀 Server ready at ${url}`);
+	});

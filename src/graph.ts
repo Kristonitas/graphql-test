@@ -1,23 +1,22 @@
-import expressGraphQL from "express-graphql";
-import { buildSchema } from "graphql";
+import { gql, IResolvers } from "apollo-server";
 
-const schema = buildSchema(`
-    type Query {
-        course(id: Int!): Course
-        courses(topic: String): [Course]
-    },
-    type Mutation {
-        updateCourseTopic(id: Int!, topic: String!): Course
-    },
-    type Course {
-        id: Int
-        title: String
-        author: String
-        description: String
-        topic: String
-        url: String
-    }
-`);
+const typeDefs = gql`
+	type Query {
+		course(id: Int!): Course
+		courses(topic: String): [Course]
+	}
+	type Mutation {
+		updateCourseTopic(id: Int!, topic: String!): Course
+	}
+	type Course {
+		id: Int
+		title: String
+		author: String
+		description: String
+		topic: String
+		url: String
+	}
+`;
 
 const coursesData = [
 	{
@@ -49,14 +48,14 @@ const coursesData = [
 	}
 ];
 
-const getCourse = (args: { id: number }) => {
+const getCourse = (parent: any, args: { id: number }) => {
 	const id = args.id;
 	return coursesData.filter(course => {
 		return course.id == id;
 	})[0];
 };
 
-const getCourses = (args: { topic: string }) => {
+const getCourses = (parent: any, args: { topic: string }) => {
 	if (args.topic) {
 		const topic = args.topic;
 		return coursesData.filter(course => course.topic === topic);
@@ -75,14 +74,14 @@ const updateCourseTopic = ({ id, topic }: { id: number; topic: string }) => {
 	return coursesData.filter(course => course.id === id)[0];
 };
 
-const root = {
-	course: getCourse,
-	courses: getCourses,
-	updateCourseTopic: updateCourseTopic
+const resolvers: IResolvers = {
+	Query: {
+		course: getCourse,
+		courses: getCourses
+	},
+	Mutation: {
+		updateCourseTopic: updateCourseTopic
+	}
 };
 
-export default expressGraphQL({
-	schema: schema,
-	rootValue: root,
-	graphiql: true
-});
+export { typeDefs, resolvers };
