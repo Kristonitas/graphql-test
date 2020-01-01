@@ -1,9 +1,10 @@
-import { gql, IResolvers } from "apollo-server";
+import { gql } from "apollo-server";
+import { QueryResolvers, MutationResolvers } from "./generated/types";
 
 const typeDefs = gql`
 	type Query {
 		course(id: Int!): Course
-		courses(topic: String): [Course]
+		courses(topic: String!): [Course]
 	}
 	type Mutation {
 		updateCourseTopic(id: Int!, topic: String!): Course
@@ -48,14 +49,14 @@ const coursesData = [
 	}
 ];
 
-const getCourse = (parent: any, args: { id: number }) => {
+const course: QueryResolvers["course"] = (parent, args) => {
 	const id = args.id;
 	return coursesData.filter(course => {
-		return course.id == id;
+		return course.id === id;
 	})[0];
 };
 
-const getCourses = (parent: any, args: { topic: string }) => {
+const courses: QueryResolvers["courses"] = (parent, args) => {
 	if (args.topic) {
 		const topic = args.topic;
 		return coursesData.filter(course => course.topic === topic);
@@ -64,7 +65,10 @@ const getCourses = (parent: any, args: { topic: string }) => {
 	}
 };
 
-const updateCourseTopic = ({ id, topic }: { id: number; topic: string }) => {
+const updateCourseTopic: MutationResolvers["updateCourseTopic"] = (
+	parent,
+	{ id, topic }
+) => {
 	coursesData.map(course => {
 		if (course.id === id) {
 			course.topic = topic;
@@ -74,13 +78,13 @@ const updateCourseTopic = ({ id, topic }: { id: number; topic: string }) => {
 	return coursesData.filter(course => course.id === id)[0];
 };
 
-const resolvers: IResolvers = {
+const resolvers = {
 	Query: {
-		course: getCourse,
-		courses: getCourses
+		course,
+		courses
 	},
 	Mutation: {
-		updateCourseTopic: updateCourseTopic
+		updateCourseTopic
 	}
 };
 
