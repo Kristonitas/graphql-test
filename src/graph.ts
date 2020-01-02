@@ -4,14 +4,14 @@ import * as db from "../db/index";
 
 const typeDefs = gql`
 	type Query {
-		course(id: Int!): Course
+		course(id: ID!): Course
 		courses(topic: String!): [Course]
 	}
 	type Mutation {
-		updateCourseTopic(id: Int!, topic: String!): Course
+		updateCourseTopic(id: ID!, topic: String!): Course
 	}
 	type Course {
-		id: Int
+		id: ID
 		title: String
 		author: String
 		description: String
@@ -19,46 +19,6 @@ const typeDefs = gql`
 		url: String
 	}
 `;
-
-const coursesData = [
-	{
-		title: "The Complete Node.js Developer Course",
-		author: "Andrew Mead, Rob Percival",
-		description:
-			"Learn Node.js by building real-world applications with Node, Express, MongoDB, Mocha, and more!",
-		topic: "Node.js",
-		url: "https://codingthesmartway.com/courses/nodejs/"
-	},
-	{
-		title: "Node.js, Express & MongoDB Dev to Deployment",
-		author: "Brad Traversy",
-		description:
-			"Learn by example building & deploying real-world Node.js applications from absolute scratch",
-		topic: "Node.js",
-		url: "https://codingthesmartway.com/courses/nodejs-express-mongodb/"
-	},
-	{
-		title: "JavaScript: Understanding The Weird Parts",
-		author: "Anthony Alicea",
-		description:
-			"An advanced JavaScript course for everyone! Scope, closures, prototypes, this, build your own framework, and more.",
-		topic: "JavaScript",
-		url: "https://codingthesmartway.com/courses/understand-javascript/"
-	}
-];
-
-db.execute(async () => {
-	const courseRep = db.getCourseRepository();
-	const entries = await courseRep.count();
-	if (entries > 0) {
-		return;
-	}
-
-	for (const c of coursesData) {
-		const entity = await courseRep.create(c);
-		await courseRep.save(entity);
-	}
-});
 
 const course: QueryResolvers["course"] = async (parent, args) => {
 	const { id } = args;

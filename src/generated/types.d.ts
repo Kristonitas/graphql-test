@@ -20,7 +20,7 @@ export enum CacheControlScope {
 
 export type Course = {
    __typename?: 'Course',
-  id?: Maybe<Scalars['Int']>,
+  id?: Maybe<Scalars['ID']>,
   title?: Maybe<Scalars['String']>,
   author?: Maybe<Scalars['String']>,
   description?: Maybe<Scalars['String']>,
@@ -35,7 +35,7 @@ export type Mutation = {
 
 
 export type MutationUpdateCourseTopicArgs = {
-  id: Scalars['Int'],
+  id: Scalars['ID'],
   topic: Scalars['String']
 };
 
@@ -47,12 +47,12 @@ export type Query = {
 
 
 export type QueryCourseArgs = {
-  id: Scalars['Int']
+  id: Scalars['ID']
 };
 
 
 export type QueryCoursesArgs = {
-  topic?: Maybe<Scalars['String']>
+  topic: Scalars['String']
 };
 
 
@@ -128,32 +128,34 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
   Query: ResolverTypeWrapper<{}>,
-  Int: ResolverTypeWrapper<Scalars['Int']>,
+  ID: ResolverTypeWrapper<Scalars['ID']>,
   Course: ResolverTypeWrapper<Course>,
   String: ResolverTypeWrapper<Scalars['String']>,
   Mutation: ResolverTypeWrapper<{}>,
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>,
   CacheControlScope: CacheControlScope,
   Upload: ResolverTypeWrapper<Scalars['Upload']>,
+  Int: ResolverTypeWrapper<Scalars['Int']>,
 };
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
   Query: {},
-  Int: Scalars['Int'],
+  ID: Scalars['ID'],
   Course: Course,
   String: Scalars['String'],
   Mutation: {},
   Boolean: Scalars['Boolean'],
   CacheControlScope: CacheControlScope,
   Upload: Scalars['Upload'],
+  Int: Scalars['Int'],
 };
 
 export type CacheControlDirectiveResolver<Result, Parent, ContextType = any, Args = {   maxAge?: Maybe<Maybe<Scalars['Int']>>,
   scope?: Maybe<Maybe<CacheControlScope>> }> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
 
 export type CourseResolvers<ContextType = any, ParentType extends ResolversParentTypes['Course'] = ResolversParentTypes['Course']> = {
-  id?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>,
+  id?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>,
   title?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   author?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   description?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
@@ -167,7 +169,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
   course?: Resolver<Maybe<ResolversTypes['Course']>, ParentType, ContextType, RequireFields<QueryCourseArgs, 'id'>>,
-  courses?: Resolver<Maybe<Array<Maybe<ResolversTypes['Course']>>>, ParentType, ContextType, QueryCoursesArgs>,
+  courses?: Resolver<Maybe<Array<Maybe<ResolversTypes['Course']>>>, ParentType, ContextType, RequireFields<QueryCoursesArgs, 'topic'>>,
 };
 
 export interface UploadScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Upload'], any> {

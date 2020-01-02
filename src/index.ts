@@ -1,10 +1,13 @@
 import { ApolloServer } from "apollo-server";
 import { typeDefs, resolvers } from "./graph";
+import mock from "./mock";
 
 const server = new ApolloServer({
 	typeDefs,
 	resolvers
 });
+
+mock();
 
 server
 	.listen({
