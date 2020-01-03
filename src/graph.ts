@@ -24,9 +24,7 @@ const course: QueryResolvers["course"] = async (parent, args) => {
 	const { id } = args;
 
 	return await db.execute(async () => {
-		const courseRep = db.getCourseRepository();
-
-		const course = await courseRep.findOne(id);
+		const course = await db.Course.findOne(id);
 
 		// TODO: why graphql wants non-nullable return?
 		return course!;
@@ -41,9 +39,7 @@ const courses: QueryResolvers["courses"] = async (parent, args) => {
 	}
 
 	return await db.execute(async () => {
-		const courseRep = db.getCourseRepository();
-
-		const courses = await courseRep.find({ topic });
+		const courses = await db.Course.find({ topic });
 
 		return courses;
 	});
@@ -56,9 +52,7 @@ const updateCourseTopic: MutationResolvers["updateCourseTopic"] = async (
 	const { id, topic } = args;
 
 	return await db.execute(async () => {
-		const courseRep = db.getCourseRepository();
-
-		const course = await courseRep.findOne(id);
+		const course = await db.Course.findOne(id);
 
 		if (!course) {
 			// TODO: why graphql wants non-nullable return?
@@ -66,7 +60,7 @@ const updateCourseTopic: MutationResolvers["updateCourseTopic"] = async (
 		}
 
 		course.topic = topic;
-		return await courseRep.save(course);
+		return await db.Course.save(course);
 	});
 };
 

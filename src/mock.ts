@@ -29,15 +29,14 @@ const coursesData = [
 
 export default () => {
 	return db.execute(async () => {
-		const courseRep = db.getCourseRepository();
-		const entries = await courseRep.count();
+		const entries = await db.Course.count();
 		if (entries > 0) {
 			return;
 		}
 
 		for (const c of coursesData) {
-			const entity = await courseRep.create(c);
-			await courseRep.save(entity);
+			const entity = await db.Course.create(c);
+			await entity.save();
 		}
 	});
 };
