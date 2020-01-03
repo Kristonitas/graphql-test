@@ -1,6 +1,6 @@
 import { gql } from "apollo-server";
 import { QueryResolvers, MutationResolvers } from "./generated/types";
-import * as db from "../db/index";
+import db, { Course } from "../db/index";
 
 const typeDefs = gql`
 	type Query {
@@ -23,8 +23,8 @@ const typeDefs = gql`
 const course: QueryResolvers["course"] = async (parent, args) => {
 	const { id } = args;
 
-	return await db.execute(async () => {
-		const course = await db.Course.findOne(id);
+	return await db(async () => {
+		const course = await Course.findOne(id);
 
 		// TODO: why graphql wants non-nullable return?
 		return course!;
@@ -38,8 +38,8 @@ const courses: QueryResolvers["courses"] = async (parent, args) => {
 		return [];
 	}
 
-	return await db.execute(async () => {
-		const courses = await db.Course.find({ topic });
+	return await db(async () => {
+		const courses = await Course.find({ topic });
 
 		return courses;
 	});
@@ -51,8 +51,8 @@ const updateCourseTopic: MutationResolvers["updateCourseTopic"] = async (
 ) => {
 	const { id, topic } = args;
 
-	return await db.execute(async () => {
-		const course = await db.Course.findOne(id);
+	return await db(async () => {
+		const course = await Course.findOne(id);
 
 		if (!course) {
 			// TODO: why graphql wants non-nullable return?
@@ -60,7 +60,7 @@ const updateCourseTopic: MutationResolvers["updateCourseTopic"] = async (
 		}
 
 		course.topic = topic;
-		return await db.Course.save(course);
+		return await Course.save(course);
 	});
 };
 

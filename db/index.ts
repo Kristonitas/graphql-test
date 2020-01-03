@@ -7,7 +7,7 @@ import { Course } from "./entity/Course";
 export { Course } from "./entity/Course";
 import config from "./ormconfig";
 
-const execute = async <T>(func: () => Promise<T>): Promise<T> => {
+const db = async <T>(func: () => Promise<T>): Promise<T> => {
 	const connection = await createConnection(config);
 
 	const result = await func();
@@ -15,4 +15,4 @@ const execute = async <T>(func: () => Promise<T>): Promise<T> => {
 	return result;
 };
 
-export { execute };
+export default db;

@@ -1,4 +1,4 @@
-import * as db from "../db/index";
+import db, { Course } from "../db/index";
 
 const coursesData = [
 	{
@@ -28,14 +28,14 @@ const coursesData = [
 ];
 
 export default () => {
-	return db.execute(async () => {
-		const entries = await db.Course.count();
+	return db(async () => {
+		const entries = await Course.count();
 		if (entries > 0) {
 			return;
 		}
 
 		for (const c of coursesData) {
-			const entity = await db.Course.create(c);
+			const entity = await Course.create(c);
 			await entity.save();
 		}
 	});
